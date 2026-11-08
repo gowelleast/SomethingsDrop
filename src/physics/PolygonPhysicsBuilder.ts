@@ -143,21 +143,44 @@ export class PolygonPhysicsBuilder {
         rawPoints.pop();
       }
 
-      simplifiedVerts = simplify(rawPoints, 1.75, true);
+      const isRollingObject =
+        spec.friction <= 0.08 &&
+        spec.restitution >= 0.35 &&
+        Math.abs(finalInnerW - finalInnerH) /
+          Math.max(1, finalInnerW, finalInnerH) <
+          0.28;
+      simplifiedVerts = simplify(rawPoints, isRollingObject ? 0.75 : 1.75, true);
     }
 
     // 7. Create Matter.js body (concave decomposition via poly-decomp built into Phaser)
     const MatterLib = Phaser.Physics.Matter.Matter;
     const isBouncyPad = spec.trait === "bouncy";
+    const isLowFrictionRoller =
+      !isBouncyPad &&
+      spec.friction <= 0.08 &&
+      spec.restitution >= 0.35 &&
+      Math.abs(finalInnerW - finalInnerH) /
+        Math.max(1, finalInnerW, finalInnerH) <
+        0.28;
     const bodyOptions: MatterJS.IBodyDefinition = {
       density: Phaser.Math.Clamp(spec.density, 0.0004, 0.06),
       friction: isBouncyPad
         ? Math.max(0.88, Phaser.Math.Clamp(spec.friction, 0.0005, 1.0))
         : Phaser.Math.Clamp(spec.friction, 0.0005, 1.0),
       frictionStatic:
-        spec.trait === "slippery" ? 0.001 : isBouncyPad ? 0.95 : 0.5,
+        spec.trait === "slippery" || isLowFrictionRoller
+          ? 0.002
+          : isBouncyPad
+            ? 0.95
+            : 0.5,
       frictionAir:
-        spec.trait === "float" ? 0.04 : isBouncyPad ? 0.025 : 0.01,
+        spec.trait === "float"
+          ? 0.04
+          : isBouncyPad
+            ? 0.025
+            : isLowFrictionRoller
+              ? 0.002
+              : 0.01,
       // Keep physical restitution low even for "bouncy" objects so they settle
       // stably on the ground when summoned (player bounce is handled via sensor impulse).
       restitution: isBouncyPad

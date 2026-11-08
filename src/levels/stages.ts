@@ -157,14 +157,14 @@ export const STAGES: StageConfig[] = [
       // Upper walkway to goal (wide 160px chute opening at x: 350..510 and 127px+ vertical throat clearance so normal balls/apples roll right in!)
       { x: 510, y: 420, width: 850 },
       // Lower sloped ramp under the chute
-      { x: 330, y: 595, width: 450, height: 24, angle: 12 },
-      // Catch floor & button wall
-      { x: 750, y: 645, width: 250, height: 28 },
-      { x: 960, y: 550, width: 38, height: 123 },
+      { x: 330, y: 590, width: 450, height: 24, angle: 12 },
+      // Gently sloped catch floor & button wall so the ball rolls all the way into the button
+      { x: 750, y: 642, width: 205, height: 28, angle: 4 },
+      { x: 915, y: 550, width: 38, height: 125 },
     ],
     slotButtons: [
       {
-        buttonX: 948,
+        buttonX: 903,
         buttonY: 620,
         facing: "left",
         barrierX: 990,

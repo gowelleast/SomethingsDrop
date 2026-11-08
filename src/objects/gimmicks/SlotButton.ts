@@ -104,7 +104,7 @@ export class SlotButton {
     }
 
     if (!this.isActivated) {
-      const hitRadius = 30;
+      const hitRadius = 36;
 
       const touchesButton = (b: MatterJS.BodyType) => {
         const minX = b.bounds.min.x - hitRadius;
@@ -115,10 +115,10 @@ export class SlotButton {
           const parts = b.parts && b.parts.length > 1 ? b.parts.slice(1) : [b];
           for (const part of parts) {
             if (
-              bx >= part.bounds.min.x - 24 &&
-              bx <= part.bounds.max.x + 24 &&
-              by >= part.bounds.min.y - 24 &&
-              by <= part.bounds.max.y + 24
+              bx >= part.bounds.min.x - 30 &&
+              bx <= part.bounds.max.x + 30 &&
+              by >= part.bounds.min.y - 30 &&
+              by <= part.bounds.max.y + 30
             ) {
               return true;
             }
@@ -130,23 +130,29 @@ export class SlotButton {
       // Only summoned objects can activate the button (never the player!)
       let triggered = false;
       for (const b of spawnedBodies) {
-        // Smoothly guide slim/small objects inside the horizontal slot tunnel so they don't snag on the entrance
+        // Smoothly guide slim/small objects and rolling balls inside the slot/catch-track so they never stall just before the button
         if (facing === "left" || facing === "right") {
           const objH = b.bounds.max.y - b.bounds.min.y;
           const objW = b.bounds.max.x - b.bounds.min.x;
           const dy = Math.abs(b.position.y - by);
           const dx = facing === "left" ? bx - b.position.x : b.position.x - bx;
-          if (objH <= 72 && dy < 45 && dx > 0 && dx < 280) {
+          if (objH <= 118 && dy < 68 && dx > 0 && dx < 320) {
             // If it's a long rod (like a pencil/stick), keep it level so its tip enters the slot cleanly
             if (objW > objH * 1.6 && Math.abs(b.angle) < 0.45) {
               MatterBody.setAngle(b, b.angle * 0.8);
               MatterBody.setAngularVelocity(b, b.angularVelocity * 0.5);
             }
-            // If nudged toward the button, help it glide along the slot floor
             const dir = facing === "left" ? 1 : -1;
-            if (b.velocity.x * dir > 0.15) {
+            const isRoundish =
+              Math.abs(objW - objH) <= Math.max(objW, objH) * 0.35 &&
+              objH <= 115;
+            // If nudged toward the button (or if a round ball landed on the catch floor near the button), carry it cleanly into the button
+            if (
+              b.velocity.x * dir > 0.12 ||
+              (isRoundish && dx < 240 && b.velocity.x * dir >= -0.15)
+            ) {
               MatterBody.setVelocity(b, {
-                x: Math.sign(b.velocity.x) * Math.max(Math.abs(b.velocity.x), 2.2),
+                x: dir * Math.max(Math.abs(b.velocity.x), 2.5),
                 y: b.velocity.y * 0.5,
               });
             }
