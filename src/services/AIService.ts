@@ -1,5 +1,6 @@
 import {
   ObjectTrait,
+  sanitizeHttpUrl,
   settingsStore,
   WordPhysicsSpec,
 } from "../config/settings";
@@ -46,7 +47,7 @@ export class AIService {
     sdBaseUrl: string,
     forceCheck = false
   ): Promise<boolean> {
-    const cleanSd = sdBaseUrl.replace(/\/+$/, "");
+    const cleanSd = sanitizeHttpUrl(sdBaseUrl, "", true);
     if (!cleanSd) return false;
 
     const now = Date.now();
@@ -276,7 +277,8 @@ export class AIService {
     model: string,
     timeoutMs: number
   ): Promise<WordPhysicsSpec | null> {
-    const cleanUrl = ollamaBaseUrl.replace(/\/+$/, "");
+    const cleanUrl = sanitizeHttpUrl(ollamaBaseUrl, "", true);
+    if (!cleanUrl) return null;
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), timeoutMs);
 
@@ -354,11 +356,20 @@ export class AIService {
         return Number.isFinite(n) ? Math.min(max, Math.max(min, n)) : fallback;
       };
 
+      const rawPrompt =
+        typeof parsed.englishPrompt === "string"
+          ? parsed.englishPrompt.replace(/[\u0000-\u001F\u007F<>]/g, "").trim()
+          : "";
+      const rawBadge =
+        typeof parsed.badgeText === "string"
+          ? parsed.badgeText.replace(/[\u0000-\u001F\u007F<>]/g, "").trim()
+          : "";
+
       return {
         word,
         englishPrompt:
-          typeof parsed.englishPrompt === "string" && parsed.englishPrompt
-            ? parsed.englishPrompt
+          rawPrompt.length > 0 && rawPrompt.length <= 240
+            ? rawPrompt
             : `a single ${word}, 2d game sprite prop, flat vector illustration, solid pure white background`,
         scale: clamp(parsed.scale, 0.5, 2.2, 1.15),
         density: normalizedDensity,
@@ -372,8 +383,8 @@ export class AIService {
         ),
         trait,
         badgeText:
-          typeof parsed.badgeText === "string" && parsed.badgeText
-            ? parsed.badgeText
+          rawBadge.length > 0 && rawBadge.length <= 40
+            ? rawBadge
             : `✨ ${word}`,
         colorAccent: colorMap[trait],
       };
@@ -392,7 +403,10 @@ export class AIService {
     u2netUrl: string,
     timeoutMs: number
   ): Promise<string> {
-    const cleanSd = sdBaseUrl.replace(/\/+$/, "");
+    const cleanSd = sanitizeHttpUrl(sdBaseUrl, "", true);
+    if (!cleanSd) {
+      throw new Error("유효하지 않은 Stable Diffusion 서버 주소입니다.");
+    }
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), timeoutMs);
     // Strip "icon", "sticker", "die-cut", or legacy style suffixes so SDXL doesn't draw an app-icon square frame or cut-line
@@ -430,15 +444,15 @@ export class AIService {
 
       const data = await res.json();
       const rawBase64: string | undefined = data?.images?.[0];
-      if (!rawBase64) {
+      if (!rawBase64 || typeof rawBase64 !== "string") {
         throw new Error("SD 응답에 이미지가 없습니다.");
       }
 
       // If optional U2Net / Rembg endpoint is configured, strip background there;
       // otherwise PolygonPhysicsBuilder's built-in flood-fill remover handles it!
-      if (u2netUrl && u2netUrl.trim() !== "") {
+      const cleanU2 = sanitizeHttpUrl(u2netUrl, "", true);
+      if (cleanU2) {
         try {
-          const cleanU2 = u2netUrl.replace(/\/+$/, "");
           const remRes = await fetch(cleanU2, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -450,7 +464,9 @@ export class AIService {
           });
           if (remRes.ok) {
             const remData = await remRes.json();
-            if (remData.image) return remData.image;
+            if (typeof remData?.image === "string" && remData.image) {
+              return remData.image;
+            }
           }
         } catch (remErr) {
           console.warn(
@@ -466,6 +482,18 @@ export class AIService {
     }
   }
 
+  private static isHttpsToPrivateHttp(targetUrl: string): boolean {
+    if (
+      typeof window === "undefined" ||
+      window.location.protocol !== "https:"
+    ) {
+      return false;
+    }
+    return /^http:\/\/(192\.168\.|10\.|172\.(1[6-9]|2\d|3[0-1])\.)/i.test(
+      targetUrl
+    );
+  }
+
   /**
    * Tests connectivity to Windows PC Ollama and Stable Diffusion servers.
    */
@@ -479,49 +507,67 @@ export class AIService {
     let sdMessage = "미연결";
     let detectedModel: string | undefined;
 
-    try {
-      const cleanOllama = ollamaUrl.replace(/\/+$/, "");
-      const res = await fetch(`${cleanOllama}/api/tags`, {
-        method: "GET",
-        signal: AbortSignal.timeout(3000),
-      });
-      if (res.ok) {
-        const data = await res.json();
-        const allModels: string[] = (data.models || []).map((m: any) => m.name);
-        const models = allModels.slice(0, 3);
-        const preferred =
-          allModels.find((m) => m.includes("gemma4")) ||
-          allModels.find((m) => m.includes("gemma")) ||
-          allModels[0];
-        if (preferred) {
-          detectedModel = preferred;
+    const cleanOllama = sanitizeHttpUrl(ollamaUrl, "", true);
+    if (!cleanOllama) {
+      ollamaMessage = "유효한 http(s):// 주소를 입력해주세요";
+    } else {
+      try {
+        const res = await fetch(`${cleanOllama}/api/tags`, {
+          method: "GET",
+          signal: AbortSignal.timeout(3000),
+        });
+        if (res.ok) {
+          const data = await res.json();
+          const allModels: string[] = (data.models || [])
+            .map((m: any) =>
+              typeof m?.name === "string"
+                ? m.name.replace(/[\u0000-\u001F\u007F<>'"`]/g, "").trim()
+                : ""
+            )
+            .filter(Boolean);
+          const models = allModels.slice(0, 3);
+          const preferred =
+            allModels.find((m) => m.includes("gemma4")) ||
+            allModels.find((m) => m.includes("gemma")) ||
+            allModels[0];
+          if (preferred) {
+            detectedModel = preferred;
+          }
+          ollamaOk = true;
+          ollamaMessage =
+            models.length > 0
+              ? `연결됨 (${models.join(", ")})`
+              : "연결됨 (설치된 모델 확인 필요)";
+        } else {
+          ollamaMessage = `HTTP ${res.status}`;
         }
-        ollamaOk = true;
-        ollamaMessage =
-          models.length > 0
-            ? `연결됨 (${models.join(", ")})`
-            : "연결됨 (설치된 모델 확인 필요)";
-      } else {
-        ollamaMessage = `HTTP ${res.status}`;
+      } catch {
+        ollamaMessage = this.isHttpsToPrivateHttp(cleanOllama)
+          ? "HTTPS 배포 사이트 → 사설 HTTP IP 차단됨 (로컬 yarn dev 실행 또는 HTTPS 터널 필요)"
+          : "연결 실패 (IP/포트 및 OLLAMA_ORIGINS=* 확인)";
       }
-    } catch {
-      ollamaMessage = "연결 실패 (IP/포트 및 OLLAMA_ORIGINS=* 확인)";
     }
 
-    const cleanSd = sdUrl.replace(/\/+$/, "");
-    try {
-      const res = await fetch(`${cleanSd}/sdapi/v1/options`, {
-        method: "GET",
-        signal: AbortSignal.timeout(3000),
-      });
-      if (res.ok) {
-        sdOk = true;
-        sdMessage = "연결됨 (SD API 활성)";
-      } else {
-        sdMessage = `HTTP ${res.status}`;
+    const cleanSd = sanitizeHttpUrl(sdUrl, "", true);
+    if (!cleanSd) {
+      sdMessage = "유효한 http(s):// 주소를 입력해주세요";
+    } else {
+      try {
+        const res = await fetch(`${cleanSd}/sdapi/v1/options`, {
+          method: "GET",
+          signal: AbortSignal.timeout(3000),
+        });
+        if (res.ok) {
+          sdOk = true;
+          sdMessage = "연결됨 (SD API 활성)";
+        } else {
+          sdMessage = `HTTP ${res.status}`;
+        }
+      } catch {
+        sdMessage = this.isHttpsToPrivateHttp(cleanSd)
+          ? "HTTPS 배포 사이트 → 사설 HTTP IP 차단됨 (로컬 yarn dev 실행 또는 HTTPS 터널 필요)"
+          : "연결 실패 (--api --cors-allow-origins=* 옵션 확인)";
       }
-    } catch {
-      sdMessage = "연결 실패 (--api --cors-allow-origins=* 옵션 확인)";
     }
 
     if (cleanSd) {
@@ -537,6 +583,12 @@ export class AIService {
 
   private static loadImageFromUrl(url: string): Promise<HTMLImageElement> {
     return new Promise((resolve, reject) => {
+      if (
+        !/^data:image\/(png|jpeg|jpg|webp);base64,[A-Za-z0-9+/=\s]+$/i.test(url)
+      ) {
+        reject(new Error("허용되지 않은 이미지 데이터 형식입니다."));
+        return;
+      }
       const img = new Image();
       img.crossOrigin = "anonymous";
       img.onload = () => resolve(img);

@@ -130,30 +130,22 @@ export class HudOverlay {
             <div class="sd-field-row">
               <label class="sd-field">
                 <span>Ollama 주소</span>
-                <input id="sd-cfg-ollama" type="text" value="${
-                  s.ollamaUrl
-                }" placeholder="http://192.168.0.x:11434" />
+                <input id="sd-cfg-ollama" type="text" placeholder="http://192.168.0.x:11434" />
               </label>
               <label class="sd-field" style="max-width: 160px;">
                 <span>모델명</span>
-                <input id="sd-cfg-model" type="text" value="${
-                  s.ollamaModel
-                }" placeholder="gemma4:e4b" />
+                <input id="sd-cfg-model" type="text" placeholder="gemma4:e4b" />
               </label>
             </div>
 
             <label class="sd-field">
               <span>Stable Diffusion 주소</span>
-              <input id="sd-cfg-sd" type="text" value="${
-                s.sdUrl
-              }" placeholder="http://192.168.0.x:7860" />
+              <input id="sd-cfg-sd" type="text" placeholder="http://192.168.0.x:7860" />
             </label>
 
             <label class="sd-field">
               <span>U2Net 주소 (선택)</span>
-              <input id="sd-cfg-u2net" type="text" value="${
-                s.u2netUrl
-              }" placeholder="비워두면 자동 배경 투명화" />
+              <input id="sd-cfg-u2net" type="text" placeholder="비워두면 자동 배경 투명화" />
             </label>
 
             <label class="sd-checkbox">
@@ -204,6 +196,14 @@ export class HudOverlay {
     ) as HTMLElement;
     this.stageModal = this.root.querySelector("#sd-stage-modal") as HTMLElement;
     this.clearModal = this.root.querySelector("#sd-clear-modal") as HTMLElement;
+
+    (this.root.querySelector("#sd-cfg-ollama") as HTMLInputElement).value =
+      s.ollamaUrl;
+    (this.root.querySelector("#sd-cfg-model") as HTMLInputElement).value =
+      s.ollamaModel;
+    (this.root.querySelector("#sd-cfg-sd") as HTMLInputElement).value = s.sdUrl;
+    (this.root.querySelector("#sd-cfg-u2net") as HTMLInputElement).value =
+      s.u2netUrl;
 
     this.root.querySelector("#sd-btn-home")?.addEventListener("click", () => {
       this.callbacks.onBackToTitle();
@@ -339,14 +339,16 @@ export class HudOverlay {
         if (res.detectedModel && modelInput) {
           modelInput.value = res.detectedModel;
         }
-        testBox.innerHTML = `
-          <div>• <b>Ollama:</b> ${res.ollamaOk ? "🟢" : "🔴"} ${
-          res.ollamaMessage
-        }</div>
-          <div>• <b>Stable Diffusion:</b> ${res.sdOk ? "🟢" : "🔴"} ${
-          res.sdMessage
-        }</div>
-        `;
+        testBox.textContent = "";
+        const appendRow = (label: string, ok: boolean, msg: string) => {
+          const row = document.createElement("div");
+          const bold = document.createElement("b");
+          bold.textContent = `${label}:`;
+          row.append("• ", bold, ` ${ok ? "🟢" : "🔴"} ${msg}`);
+          testBox.appendChild(row);
+        };
+        appendRow("Ollama", res.ollamaOk, res.ollamaMessage);
+        appendRow("Stable Diffusion", res.sdOk, res.sdMessage);
       });
 
     this.root

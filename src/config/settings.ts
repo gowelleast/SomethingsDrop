@@ -35,18 +35,93 @@ export interface GameSettings {
 const STORAGE_KEY = "somethings_drop_settings_v3";
 const STARS_STORAGE_KEY = "somethings_drop_stage_stars_v1";
 
+const VALID_AI_MODES: readonly AIMode[] = ["auto", "lan", "offline"];
+
+/**
+ * Validates that a server URL uses strictly http:// or https:// protocol,
+ * strips embedded credentials and trailing slashes, and falls back safely.
+ */
+export function sanitizeHttpUrl(
+  rawUrl: unknown,
+  fallback: string,
+  allowEmpty = false
+): string {
+  if (typeof rawUrl !== "string") return fallback;
+  const trimmed = rawUrl.trim();
+  if (!trimmed) return allowEmpty ? "" : fallback;
+  if (trimmed.length > 300) return fallback;
+
+  try {
+    const parsed = new URL(trimmed);
+    if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+      return fallback;
+    }
+    parsed.username = "";
+    parsed.password = "";
+    parsed.hash = "";
+    return parsed.toString().replace(/\/+$/, "");
+  } catch {
+    return fallback;
+  }
+}
+
+function sanitizeModelName(rawModel: unknown, fallback: string): string {
+  if (typeof rawModel !== "string") return fallback;
+  const cleaned = rawModel.replace(/[\u0000-\u001F\u007F<>'"`]/g, "").trim();
+  if (!cleaned || cleaned.length > 80) return fallback;
+  return cleaned;
+}
+
 const metaEnv = (import.meta as any).env || {};
 
 const DEFAULT_SETTINGS: GameSettings = {
   aiMode: "auto",
-  ollamaUrl: metaEnv.VITE_OLLAMA_URL || "http://127.0.0.1:11434",
-  ollamaModel: metaEnv.VITE_OLLAMA_MODEL || "gemma4:e4b",
-  sdUrl: metaEnv.VITE_SD_URL || "http://127.0.0.1:7860",
+  ollamaUrl: sanitizeHttpUrl(
+    metaEnv.VITE_OLLAMA_URL,
+    "http://127.0.0.1:11434"
+  ),
+  ollamaModel: sanitizeModelName(metaEnv.VITE_OLLAMA_MODEL, "gemma4:e4b"),
+  sdUrl: sanitizeHttpUrl(metaEnv.VITE_SD_URL, "http://127.0.0.1:7860"),
   u2netUrl: "",
   useCache: true,
   debugPhysics: false,
   requestTimeoutMs: 25000,
 };
+
+function sanitizeSettingsObject(raw: unknown): GameSettings {
+  if (!raw || typeof raw !== "object") {
+    return { ...DEFAULT_SETTINGS };
+  }
+  const obj = raw as Record<string, unknown>;
+  const aiMode: AIMode = VALID_AI_MODES.includes(obj.aiMode as AIMode)
+    ? (obj.aiMode as AIMode)
+    : DEFAULT_SETTINGS.aiMode;
+
+  const timeoutNum = Number(obj.requestTimeoutMs);
+  const requestTimeoutMs = Number.isFinite(timeoutNum)
+    ? Math.max(2000, Math.min(60000, Math.round(timeoutNum)))
+    : DEFAULT_SETTINGS.requestTimeoutMs;
+
+  return {
+    aiMode,
+    ollamaUrl: sanitizeHttpUrl(obj.ollamaUrl, DEFAULT_SETTINGS.ollamaUrl),
+    ollamaModel: sanitizeModelName(
+      obj.ollamaModel,
+      DEFAULT_SETTINGS.ollamaModel
+    ),
+    sdUrl: sanitizeHttpUrl(obj.sdUrl, DEFAULT_SETTINGS.sdUrl),
+    u2netUrl: sanitizeHttpUrl(obj.u2netUrl, "", true),
+    useCache:
+      typeof obj.useCache === "boolean"
+        ? obj.useCache
+        : DEFAULT_SETTINGS.useCache,
+    debugPhysics:
+      typeof obj.debugPhysics === "boolean"
+        ? obj.debugPhysics
+        : DEFAULT_SETTINGS.debugPhysics,
+    requestTimeoutMs,
+  };
+}
 
 class SettingsManager {
   private current: GameSettings;
@@ -59,12 +134,29 @@ class SettingsManager {
   }
 
   private loadStars(): Record<number, number> {
+    const safeStars: Record<number, number> = {};
     try {
       const raw = localStorage.getItem(STARS_STORAGE_KEY);
-      if (!raw) return {};
-      return JSON.parse(raw) || {};
+      if (!raw) return safeStars;
+      const parsed = JSON.parse(raw);
+      if (!parsed || typeof parsed !== "object") return safeStars;
+      for (const [k, v] of Object.entries(parsed)) {
+        const id = Number(k);
+        const stars = Number(v);
+        if (
+          Number.isInteger(id) &&
+          id >= 1 &&
+          id <= 200 &&
+          Number.isInteger(stars) &&
+          stars >= 1 &&
+          stars <= 3
+        ) {
+          safeStars[id] = stars;
+        }
+      }
+      return safeStars;
     } catch {
-      return {};
+      return safeStars;
     }
   }
 
@@ -77,7 +169,8 @@ class SettingsManager {
   }
 
   recordStageClear(stageId: number, stars: number): void {
-    const clamped = Math.max(1, Math.min(3, stars));
+    if (!Number.isInteger(stageId) || stageId < 1 || stageId > 200) return;
+    const clamped = Math.max(1, Math.min(3, Math.round(stars)));
     const prev = this.stageStars[stageId] ?? 0;
     if (clamped > prev) {
       this.stageStars[stageId] = clamped;
@@ -96,7 +189,7 @@ class SettingsManager {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (!raw) return { ...DEFAULT_SETTINGS };
-      return { ...DEFAULT_SETTINGS, ...JSON.parse(raw) };
+      return sanitizeSettingsObject(JSON.parse(raw));
     } catch {
       return { ...DEFAULT_SETTINGS };
     }
@@ -107,7 +200,7 @@ class SettingsManager {
   }
 
   update(patch: Partial<GameSettings>): GameSettings {
-    this.current = { ...this.current, ...patch };
+    this.current = sanitizeSettingsObject({ ...this.current, ...patch });
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(this.current));
     } catch {

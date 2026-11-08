@@ -36,6 +36,7 @@ export default class GameScene extends Phaser.Scene {
 
   private totalSpawnsInStage = 0;
   private isStageCleared = false;
+  private sceneGeneration = 0;
   private readonly handleLaserPlayerHit = () => {
     this.player.respawn(this.currentStage.spawn.x, this.currentStage.spawn.y);
   };
@@ -45,6 +46,7 @@ export default class GameScene extends Phaser.Scene {
   }
 
   init(data?: { stageId?: number }) {
+    this.sceneGeneration++;
     if (data?.stageId) {
       const idx = STAGES.findIndex((s) => s.id === data.stageId);
       if (idx >= 0) this.currentStageIndex = idx;
@@ -343,13 +345,21 @@ export default class GameScene extends Phaser.Scene {
   }
 
   private async summonWord(word: string) {
-    if (!this.hud) return;
+    if (!this.hud || this.isStageCleared) return;
 
+    const gen = this.sceneGeneration;
     this.hud.setLoading(true);
     this.portalCursor.pulse();
 
     try {
       const result = await AIService.generateForWord(word);
+      if (
+        gen !== this.sceneGeneration ||
+        !this.scene.isActive() ||
+        this.isStageCleared
+      ) {
+        return;
+      }
 
       const spawnPt = this.portalCursor.getSpawnPoint();
       const built = PolygonPhysicsBuilder.buildFromImage(
