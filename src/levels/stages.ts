@@ -147,28 +147,28 @@ export const STAGES: StageConfig[] = [
     theme: "meadow",
     worldWidth: 1360,
     worldHeight: 720,
-    spawn: { x: 110, y: 400 },
-    goal: { x: 1120, y: 426 },
+    spawn: { x: 110, y: 350 },
+    goal: { x: 1120, y: 376 },
     threeStarLimit: 1,
     recommendedWords: [],
     platforms: [
       // Left start platform
-      { x: 0, y: 470, width: 370 },
-      // Upper walkway to goal (generous 120px chute opening at x: 370..490 so normal balls/apples roll right in!)
-      { x: 490, y: 470, width: 870 },
+      { x: 0, y: 420, width: 350 },
+      // Upper walkway to goal (wide 160px chute opening at x: 350..510 and 127px+ vertical throat clearance so normal balls/apples roll right in!)
+      { x: 510, y: 420, width: 850 },
       // Lower sloped ramp under the chute
-      { x: 350, y: 580, width: 460, height: 26, angle: 13 },
+      { x: 330, y: 595, width: 450, height: 24, angle: 12 },
       // Catch floor & button wall
-      { x: 780, y: 635, width: 220, height: 28 },
-      { x: 960, y: 555, width: 38, height: 108 },
+      { x: 750, y: 645, width: 250, height: 28 },
+      { x: 960, y: 550, width: 38, height: 123 },
     ],
     slotButtons: [
       {
         buttonX: 948,
-        buttonY: 612,
+        buttonY: 620,
         facing: "left",
         barrierX: 990,
-        barrierY: 320,
+        barrierY: 270,
         barrierW: 260,
         barrierH: 150,
         isCage: true,
@@ -177,7 +177,7 @@ export const STAGES: StageConfig[] = [
     hints: [
       {
         x: 520,
-        y: 380,
+        y: 330,
         text: "💡 경사로 트랙: 사과나 공처럼 둥근 사물을 구멍으로 굴려 아래 버튼을 누르세요!",
       },
     ],
@@ -799,30 +799,30 @@ export const STAGES: StageConfig[] = [
     theme: "workshop",
     worldWidth: 1400,
     worldHeight: 720,
-    spawn: { x: 110, y: 200 },
-    goal: { x: 1160, y: 226 },
+    spawn: { x: 110, y: 160 },
+    goal: { x: 1160, y: 186 },
     threeStarLimit: 2,
     recommendedWords: [],
     platforms: [
-      { x: 0, y: 270, width: 360 },
-      { x: 540, y: 270, width: 860 },
-      // Upper ramp (leaves a wide 130px drop opening on the right between x=710 and x=840)
-      { x: 330, y: 375, width: 390, height: 24, angle: 13 },
+      { x: 0, y: 230, width: 350 },
+      { x: 530, y: 230, width: 870 },
+      // Upper ramp (leaves a wide 180px drop opening and 115px+ vertical throat clearance)
+      { x: 330, y: 385, width: 390, height: 24, angle: 12 },
       // Right rebound wall so balls drop cleanly onto the lower ramp
-      { x: 840, y: 350, width: 36, height: 210 },
+      { x: 840, y: 350, width: 36, height: 220 },
       // Lower ramp with generous vertical clearance (165px below upper ramp!)
-      { x: 470, y: 540, width: 390, height: 24, angle: -13 },
+      { x: 470, y: 550, width: 390, height: 24, angle: -12 },
       // Bottom catch floor & left button wall
-      { x: 280, y: 640, width: 340, height: 28 },
-      { x: 280, y: 530, width: 36, height: 138 },
+      { x: 280, y: 645, width: 340, height: 28 },
+      { x: 280, y: 535, width: 36, height: 138 },
     ],
     slotButtons: [
       {
         buttonX: 330,
-        buttonY: 612,
+        buttonY: 616,
         facing: "right",
         barrierX: 1030,
-        barrierY: 120,
+        barrierY: 80,
         barrierW: 250,
         barrierH: 150,
         isCage: true,
@@ -1155,21 +1155,21 @@ export const STAGES: StageConfig[] = [
     theme: "sky",
     worldWidth: 1420,
     worldHeight: 720,
-    spawn: { x: 110, y: 280 },
-    goal: { x: 1180, y: 306 },
+    spawn: { x: 110, y: 260 },
+    goal: { x: 1180, y: 286 },
     threeStarLimit: 2,
     recommendedWords: [],
     platforms: [
-      { x: 0, y: 350, width: 360 },
-      { x: 520, y: 350, width: 900 },
-      { x: 330, y: 470, width: 360, height: 26, angle: 15 },
-      { x: 880, y: 540, width: 280, height: 28 },
-      { x: 1120, y: 450, width: 38, height: 118 },
+      { x: 0, y: 330, width: 350 },
+      { x: 520, y: 330, width: 900 },
+      { x: 330, y: 500, width: 360, height: 26, angle: 14 },
+      { x: 880, y: 570, width: 280, height: 28 },
+      { x: 1120, y: 480, width: 38, height: 118 },
     ],
     windZones: [
       {
         x: 660,
-        y: 440,
+        y: 465,
         width: 220,
         height: 150,
         forceX: 0.0018,
@@ -1179,10 +1179,10 @@ export const STAGES: StageConfig[] = [
     slotButtons: [
       {
         buttonX: 1108,
-        buttonY: 516,
+        buttonY: 546,
         facing: "left",
         barrierX: 1050,
-        barrierY: 200,
+        barrierY: 180,
         barrierW: 250,
         barrierH: 150,
         isCage: true,
@@ -1263,27 +1263,27 @@ export const STAGES: StageConfig[] = [
     theme: "sky",
     worldWidth: 1480,
     worldHeight: 720,
-    spawn: { x: 110, y: 470 },
-    goal: { x: 1260, y: 336 },
+    spawn: { x: 110, y: 450 },
+    goal: { x: 1260, y: 316 },
     threeStarLimit: 3,
     recommendedWords: [],
     platforms: [
-      { x: 0, y: 540, width: 380 },
-      { x: 560, y: 440, width: 340 },
-      { x: 1020, y: 380, width: 460 },
-      // Lower rolling ramp to unlock the final cage
-      { x: 380, y: 575, width: 460, height: 26, angle: 13 },
-      { x: 810, y: 632, width: 240, height: 28 },
-      { x: 1020, y: 550, width: 38, height: 110 },
+      { x: 0, y: 520, width: 370 },
+      { x: 560, y: 410, width: 340 },
+      { x: 1020, y: 360, width: 460 },
+      // Lower rolling ramp with 130px+ vertical throat clearance to unlock the final cage
+      { x: 370, y: 590, width: 460, height: 24, angle: 12 },
+      { x: 800, y: 645, width: 250, height: 28 },
+      { x: 1020, y: 555, width: 38, height: 118 },
     ],
-    spikes: [{ x: 670, y: 440, width: 120 }],
+    spikes: [{ x: 670, y: 410, width: 120 }],
     slotButtons: [
       {
         buttonX: 1008,
-        buttonY: 608,
+        buttonY: 618,
         facing: "left",
         barrierX: 1130,
-        barrierY: 230,
+        barrierY: 210,
         barrierW: 250,
         barrierH: 150,
         isCage: true,
@@ -1477,30 +1477,36 @@ export const STAGES: StageConfig[] = [
     theme: "cyberlab",
     worldWidth: 1400,
     worldHeight: 720,
-    spawn: { x: 110, y: 490 },
-    goal: { x: 1200, y: 226 },
+    spawn: { x: 110, y: 390 },
+    goal: { x: 1120, y: 356 },
     threeStarLimit: 2,
     recommendedWords: [],
     platforms: [
-      { x: 0, y: 560, width: 360 },
-      { x: 560, y: 240, width: 60, height: 420 },
-      { x: 860, y: 200, width: 60, height: 460 },
-      { x: 1040, y: 270, width: 360 },
+      // Left starting platform
+      { x: 0, y: 460, width: 380 },
+      // Stepping catch-ledge in the first gap so sticky/bridge objects or jumps never fall into the void
+      { x: 380, y: 495, width: 100, height: 32 },
+      // Middle platform before the red hazard laser
+      { x: 480, y: 430, width: 210 },
+      // Magnetic/shield catch-ledge directly under the laser at x=735
+      { x: 690, y: 455, width: 90, height: 34 },
+      // Right goal platform at a comfortable stepping height
+      { x: 780, y: 400, width: 620 },
     ],
     lasers: [
       {
-        x1: 740,
-        y1: 80,
-        x2: 740,
-        y2: 700,
+        x1: 735,
+        y1: 110,
+        x2: 735,
+        y2: 455,
         mode: "hazard",
       },
     ],
     hints: [
       {
-        x: 520,
-        y: 340,
-        text: "💡 접착과 레이저 차폐: 자석·거미줄을 기둥에 붙이거나 구름을 띄워 레이저를 막고 건너세요!",
+        x: 610,
+        y: 310,
+        text: "💡 접착과 레이저 차폐: 레이저 아래 받침대에 자석·거미줄·상자를 붙이거나 구름을 띄워 레이저를 막고 건너세요!",
       },
     ],
   },
@@ -1549,37 +1555,37 @@ export const STAGES: StageConfig[] = [
     theme: "cyberlab",
     worldWidth: 1500,
     worldHeight: 720,
-    spawn: { x: 110, y: 410 },
-    goal: { x: 1280, y: 436 },
+    spawn: { x: 110, y: 380 },
+    goal: { x: 1280, y: 406 },
     threeStarLimit: 2,
     recommendedWords: [],
     platforms: [
-      { x: 0, y: 480, width: 580 },
-      { x: 340, y: 378, width: 200 },
-      { x: 480, y: 378, width: 40, height: 102 },
-      // Wide 200px drop opening (x=580..780) so balls never get stuck!
-      { x: 780, y: 480, width: 720 },
-      // Lower rolling chute with 120px vertical clearance below upper floor
-      { x: 560, y: 600, width: 420, height: 24, angle: 13 },
-      { x: 950, y: 650, width: 240, height: 28 },
-      { x: 1160, y: 560, width: 38, height: 118 },
+      { x: 0, y: 450, width: 580 },
+      { x: 340, y: 348, width: 200 },
+      { x: 480, y: 348, width: 40, height: 102 },
+      // Wide 200px drop opening (x=580..780) and 120px+ vertical throat clearance so balls never get stuck!
+      { x: 780, y: 450, width: 720 },
+      // Lower rolling chute
+      { x: 560, y: 605, width: 420, height: 24, angle: 12 },
+      { x: 950, y: 652, width: 240, height: 28 },
+      { x: 1160, y: 560, width: 38, height: 120 },
     ],
     slotButtons: [
       {
         buttonX: 468,
-        buttonY: 450,
+        buttonY: 420,
         facing: "left",
         barrierX: 960,
-        barrierY: 330,
+        barrierY: 300,
         barrierW: 28,
         barrierH: 150,
       },
       {
         buttonX: 1148,
-        buttonY: 622,
+        buttonY: 624,
         facing: "left",
         barrierX: 1150,
-        barrierY: 330,
+        barrierY: 300,
         barrierW: 250,
         barrierH: 150,
         isCage: true,
@@ -1782,60 +1788,50 @@ export const STAGES: StageConfig[] = [
     ],
   },
   {
-    id: 40,
+    id: 402,
     chapter: 4,
     stageNumber: 10,
     title: "4-10",
-    subtitle: "오메가 테스트 챔버",
+    subtitle: "사이버 배수진",
     theme: "cyberlab",
-    worldWidth: 1680,
+    worldWidth: 1500,
     worldHeight: 720,
-    spawn: { x: 100, y: 470 },
-    goal: { x: 1480, y: 206 },
-    threeStarLimit: 3,
+    spawn: { x: 110, y: 290 },
+    goal: { x: 1260, y: 566 },
+    threeStarLimit: 2,
     recommendedWords: [],
     platforms: [
-      // Phase 1: Start platform before wind-sailing spike chasm
-      { x: 0, y: 540, width: 280 },
-      { x: 280, y: 630, width: 460 },
-      // Phase 2: Middle island + Seesaw catapult pad
-      { x: 740, y: 540, width: 220 },
-      // Phase 3: Towering Omega Summit (290px above seesaw!)
-      { x: 1320, y: 250, width: 40, height: 420 },
-      { x: 1320, y: 250, width: 360 },
-      // Sensor emitter block
-      { x: 924, y: 300, width: 36, height: 70 },
+      // Upper-left platform + 170px vertical shaft (x=340..510)
+      { x: 0, y: 360, width: 340 },
+      // Return stepping ledge on left shaft wall
+      { x: 340, y: 485, width: 52, height: 24 },
+      // Upper-right control deck extending to the right wall (x=510..1500)
+      { x: 510, y: 360, width: 990 },
+      // Covered narrow slot on the upper-right control deck
+      { x: 760, y: 258, width: 200 },
+      { x: 900, y: 258, width: 40, height: 102 },
+      // Lower Omega Vault below the upper deck (only reachable by deleting the bridge over x=340..510!)
+      { x: 300, y: 360, width: 40, height: 288 },
+      { x: 300, y: 610, width: 1200 },
+      // Low-level hazard laser turret in the lower vault (player can block it or jump over once down)
+      { x: 960, y: 535, width: 36, height: 75 },
     ],
-    spikes: [{ x: 290, y: 630, width: 440 }],
-    windZones: [
-      {
-        x: 260,
-        y: 340,
-        width: 480,
-        height: 240,
-        forceX: 0.0022,
-        forceY: 0,
-      },
-    ],
-    seesaws: [{ pivotX: 1120, pivotY: 540, width: 300 }],
     lasers: [
-      // Ceiling hazard laser over the spike chasm (your sailing cloud blocks it as it passes!)
       {
-        x1: 510,
-        y1: 100,
-        x2: 510,
-        y2: 630,
+        x1: 620,
+        y1: 150,
+        x2: 620,
+        y2: 360,
         mode: "hazard",
       },
-      // Sensor laser guarding the final Omega Goal Cage
+    ],
+    slotButtons: [
       {
-        x1: 960,
-        y1: 335,
-        x2: 1320,
-        y2: 335,
-        mode: "sensor",
-        barrierX: 1350,
-        barrierY: 100,
+        buttonX: 888,
+        buttonY: 330,
+        facing: "left",
+        barrierX: 1130,
+        barrierY: 460,
         barrierW: 250,
         barrierH: 150,
         isCage: true,
@@ -1902,50 +1898,64 @@ export const STAGES: StageConfig[] = [
     ],
   },
   {
-    id: 402,
+    id: 40,
     chapter: 4,
     stageNumber: 12,
     title: "4-12",
-    subtitle: "사이버 배수진",
+    subtitle: "오메가 테스트 챔버",
     theme: "cyberlab",
-    worldWidth: 1500,
+    worldWidth: 1680,
     worldHeight: 720,
-    spawn: { x: 110, y: 290 },
-    goal: { x: 1260, y: 566 },
-    threeStarLimit: 2,
+    spawn: { x: 100, y: 470 },
+    goal: { x: 1480, y: 206 },
+    threeStarLimit: 3,
     recommendedWords: [],
     platforms: [
-      // Upper-left platform + 170px vertical shaft (x=340..510)
-      { x: 0, y: 360, width: 340 },
-      // Return stepping ledge on left shaft wall
-      { x: 340, y: 485, width: 52, height: 24 },
-      // Upper-right control deck extending to the right wall (x=510..1500)
-      { x: 510, y: 360, width: 990 },
-      // Covered narrow slot on the upper-right control deck
-      { x: 760, y: 258, width: 200 },
-      { x: 900, y: 258, width: 40, height: 102 },
-      // Lower Omega Vault below the upper deck (only reachable by deleting the bridge over x=340..510!)
-      { x: 300, y: 360, width: 40, height: 288 },
-      { x: 300, y: 610, width: 1200 },
-      // Low-level hazard laser turret in the lower vault (player can block it or jump over once down)
-      { x: 960, y: 535, width: 36, height: 75 },
+      // Phase 1: Start platform + shortened spike chasm with a central laser-blocker stepping pad
+      { x: 0, y: 540, width: 340 },
+      { x: 340, y: 630, width: 360 },
+      { x: 480, y: 575, width: 80, height: 32 },
+      // Phase 2: Middle island + Seesaw catapult pad
+      { x: 700, y: 540, width: 260 },
+      // Phase 3: Towering Omega Summit (290px above seesaw!)
+      { x: 1320, y: 250, width: 40, height: 420 },
+      { x: 1320, y: 250, width: 360 },
+      // Sensor emitter block
+      { x: 924, y: 300, width: 36, height: 70 },
     ],
-    lasers: [
+    spikes: [
+      { x: 350, y: 630, width: 120 },
+      { x: 570, y: 630, width: 120 },
+    ],
+    windZones: [
       {
-        x1: 620,
-        y1: 150,
-        x2: 620,
-        y2: 360,
-        mode: "hazard",
+        x: 320,
+        y: 340,
+        width: 400,
+        height: 240,
+        forceX: 0.002,
+        forceY: 0,
       },
     ],
-    slotButtons: [
+    seesaws: [{ pivotX: 1120, pivotY: 540, width: 300 }],
+    lasers: [
+      // Floor-mounted upward hazard laser on the center pad (blocked from below by a sailing cloud or by dropping any object onto the center pad!)
       {
-        buttonX: 888,
-        buttonY: 330,
-        facing: "left",
-        barrierX: 1130,
-        barrierY: 460,
+        x1: 520,
+        y1: 575,
+        x2: 520,
+        y2: 140,
+        mode: "hazard",
+      },
+      // Sensor laser guarding the final Omega Goal Cage
+      {
+        x1: 960,
+        y1: 335,
+        x2: 1320,
+        y2: 335,
+        mode: "sensor",
+        barrierX: 1350,
+        barrierY: 100,
         barrierW: 250,
         barrierH: 150,
         isCage: true,

@@ -222,7 +222,7 @@ export class SpawnedObject {
     if (
       this.spec.trait === "sticky" &&
       !this.isLockedSticky &&
-      this.scene.time.now - this.spawnTimestamp > 200
+      this.scene.time.now - this.spawnTimestamp > 40
     ) {
       const otherObj = (otherBody as any).gameObject;
       const isPlayer = otherObj?.getData?.("type") === "player";
