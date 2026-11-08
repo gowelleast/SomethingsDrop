@@ -13,6 +13,8 @@
 
 단어의 의미에 따라 사물의 형태와 크기, 무게, 탄성, 마찰력, 부력 등이 다르게 적용되며, 이를 이용해 다리를 놓거나 버튼을 누르고 장애물을 부수는 등 여러 방식으로 퍼즐을 풀 수 있습니다. 로컬 AI 서버(Ollama + Stable Diffusion)를 연결해 실시간으로 이미지를 생성하거나, 별도의 서버 없이 내장된 벡터 에셋으로 바로 플레이할 수 있습니다.
 
+- **플레이 링크**: [https://gowelleast.github.io/SomethingsDrop/](https://gowelleast.github.io/SomethingsDrop/)
+
 ---
 
 ## 스크린샷
